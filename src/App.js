@@ -1,13 +1,23 @@
 import './App.css';
+import Form from './Form.js';
+import axios from 'axios';
 
 function App() {
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     const query = {
-      type: e.target.type.value,
       username: e.target.username.value,
       repo: e.target.repo.value
+    }
+    console.log('hereherheheherherh', e.target.type.value)
+
+    if (e.target.type.value === 'open-requests-commits') {
+
+      const response = await axios.get('http://localhost:2550/pr/commits?user=colinhacks&repo=zod');
+
+      console.log(response);
+
     }
     console.log(query);
   }
@@ -18,27 +28,8 @@ function App() {
         <div>GitHub Searcher</div>
       </header>
 
-      <div className="App-body">
+      <Form handleSearch={handleSearch.bind(this)} />
 
-        <form className="search-form" onSubmit={handleSearch}>
-
-          <label for="type">Select Search Type:</label>
-          <select name="type">
-            <option value="repos">Repositories</option>
-            <option value="open-requests">Open Pull Requests</option>
-            <option value="open-requests-commits">Open Pull Requests + Number of Commits</option>
-          </select><br/>
-
-          <label for="username">username:</label>
-          <input type='text' name="username"></input><br/>
-
-          <label for="repo">repo:</label>
-          <input type='text' name="repo"></input><br/>
-
-          <button type="submit">search</button>
-        </form>
-
-      </div>
     </div>
   );
 }
