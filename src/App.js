@@ -6,6 +6,7 @@ import { useState } from 'react';
 function App() {
 
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -14,27 +15,32 @@ function App() {
       repo: e.target.repo.value
     }
     if (e.target.type.value === 'open-requests-commits') {
+      setLoading(true);
       const response = await axios.get('http://localhost:2550/pr/commits', {params: query});
-      setData(response.data);
+      setLoading(false);
+      const sortedData = response.data.sort((a, b) => b.value.number_of_commits - a.value.number_of_commits);
+      setData(sortedData);
     }
   }
 
   return (
     <div className="App">
-      <header className="App-header">
-        <div>GitHub Searcher</div>
-      </header>
 
       <Form handleSearch={handleSearch.bind(this)} /><br/>
 
-      {!data ? <div>loading...</div> : data.map(pr =>
-      <div key={pr.value.pull_number}>
-        {console.log(pr)}
-      <div> Title: {pr.value.pull_title} </div>
-      <div> Number of Commits: {pr.value.number_of_commits} </div>
+      <div className="responses">
+        { loading && <div> Loading... </div> }
+
+        { !data && <div> </div> }
+
+        { (data && !loading) && data.map(pr =>
+          <div className="responseData" key={pr.value.pull_number}>
+          <div><b> Title: </b> {pr.value.pull_title} </div>
+          <div><b> Number of Commits: </b>{pr.value.number_of_commits}</div><br/>
+          </div>
+        ) }
       </div>
 
-      )}
 
     </div>
   );
